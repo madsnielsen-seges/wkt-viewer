@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WKT Viewer</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>WKT Viewer</h1>
+    <p>Vis WKT-geometri direkte fra URL'en.</p>
+  </header>
+  <main>
+    <section class="controls">
+      <label for="wkt">WKT (EPSG:4326)</label>
+      <textarea id="wkt" rows="5" spellcheck="false" placeholder="POLYGON ((9.96 56.17, ...))"></textarea>
+      <div class="buttons">
+        <button id="show" type="button">Vis geometri</button>
+        <button id="copy" type="button" class="secondary">Kopiér delelink</button>
+      </div>
+      <p id="status" role="status" aria-live="polite"></p>
+    </section>
+    <div id="map" aria-label="Kort med WKT-geometri"></div>
+  </main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://unpkg.com/terraformer@1.0.12/terraformer.min.js"></script>
+  <script src="https://unpkg.com/terraformer-wkt-parser@1.2.1/terraformer-wkt-parser.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
