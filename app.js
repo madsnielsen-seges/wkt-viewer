@@ -21,14 +21,27 @@ function renderWkt(wkt, updateUrl = true) {
   }
 
   try {
-    const geojson = Terraformer.WKT.parse(wkt.trim());
-    if (geometryLayer) map.removeLayer(geometryLayer);
-    geometryLayer = L.geoJSON(geojson, {
-      style: { color: '#b42318', weight: 3, fillColor: '#62b77b', fillOpacity: 0.35 },
-      pointToLayer: (_, latlng) => L.circleMarker(latlng, { radius: 7, color: '#b42318', fillOpacity: .7 })
-    }).addTo(map);
+    const wicket = new Wkt.Wkt();
+wicket.read(wkt.trim());
 
-    const bounds = geometryLayer.getBounds();
+if (geometryLayer) {
+    map.removeLayer(geometryLayer);
+}
+
+geometryLayer = wicket.toObject({
+    color: '#b42318',
+    weight: 3,
+    fillColor: '#62b77b',
+    fillOpacity: 0.35
+});
+
+geometryLayer.addTo(map);
+
+const bounds =
+    geometryLayer.getBounds ?
+    geometryLayer.getBounds() :
+    L.featureGroup([geometryLayer]).getBounds();
+    
     if (bounds.isValid()) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 18 });
 
     if (updateUrl) {
