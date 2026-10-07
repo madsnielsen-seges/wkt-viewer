@@ -1,77 +1,17 @@
-const map = L.map('map').setView([56.17, 9.97], 13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-const input = document.getElementById('wkt');
-const status = document.getElementById('status');
-let geometryLayer;
-
-function getWktFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get('wkt') || '';
+const map=L.map('map').setView([56.17,9.97],13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+const input=document.getElementById('wkt');
+const status=document.getElementById('status');
+let layer;
+function draw(wkt){
+ try{
+  const geojson=wellknown.parse(wkt);
+  if(layer) map.removeLayer(layer);
+  layer=L.geoJSON(geojson,{style:{color:'red'}}).addTo(map);
+  map.fitBounds(layer.getBounds());
+  status.textContent='OK';
+ }catch(e){status.textContent=e.message;}
 }
-
-function renderWkt(wkt, updateUrl = true) {
-  status.textContent = '';
-  if (!wkt.trim()) {
-    status.textContent = 'Angiv en WKT-geometri.';
-    return;
-  }
-
-  try {
-    const wicket = new Wkt.Wkt();
-wicket.read(wkt.trim());
-
-if (geometryLayer) {
-    map.removeLayer(geometryLayer);
-}
-
-geometryLayer = wicket.toObject({
-    color: '#b42318',
-    weight: 3,
-    fillColor: '#62b77b',
-    fillOpacity: 0.35
-});
-
-geometryLayer.addTo(map);
-
-const bounds =
-    geometryLayer.getBounds ?
-    geometryLayer.getBounds() :
-    L.featureGroup([geometryLayer]).getBounds();
-    
-    if (bounds.isValid()) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 18 });
-
-    if (updateUrl) {
-      const url = new URL(window.location.href);
-      url.searchParams.set('wkt', wkt.trim());
-      history.replaceState(null, '', url);
-    }
-    status.style.color = '#176b3a';
-    status.textContent = 'Geometrien er vist.';
-  } catch (error) {
-    status.style.color = '#a1260d';
-    status.textContent = `WKT kunne ikke læses: ${error.message}`;
-  }
-}
-
-document.getElementById('show').addEventListener('click', () => renderWkt(input.value));
-document.getElementById('copy').addEventListener('click', async () => {
-  renderWkt(input.value);
-  try {
-    await navigator.clipboard.writeText(window.location.href);
-    status.style.color = '#176b3a';
-    status.textContent = 'Delelink kopieret.';
-  } catch {
-    status.style.color = '#a1260d';
-    status.textContent = 'Kunne ikke kopiere automatisk. Kopiér URL’en fra adresselinjen.';
-  }
-});
-
-const initialWkt = getWktFromUrl();
-if (initialWkt) {
-  input.value = initialWkt;
-  renderWkt(initialWkt, false);
-}
+const urlWkt=new URLSearchParams(location.search).get('wkt');
+if(urlWkt){input.value=urlWkt;draw(urlWkt);} 
+document.getElementById('show').onclick=()=>draw(input.value);
